@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COMPURSATIL - Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lucide@latest"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            background: #f3f4f6;
+        }
+        
+        .sidebar {
+            width: 260px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            overflow-y: auto;
+            transition: all 0.3s ease;
+        }
+        
+        .main-content {
+            margin-left: 260px;
+            padding: 1.5rem;
+            min-height: 100vh;
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            color: rgba(255, 255, 255, 0.8);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+        }
+        
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border-left-color: white;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 0.75rem;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #374151;
+            font-size: 0.875rem;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.625rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            transition: border-color 0.2s;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .btn {
+            padding: 0.625rem 1rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            font-size: 0.875rem;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+        
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+        
+        .btn-secondary {
+            background: #e5e7eb;
+            color: #374151;
+        }
+        
+        .btn-secondary:hover {
+            background: #d1d5db;
+        }
+        
+        .btn-small {
+            padding: 0.375rem 0.75rem;
+            font-size: 0.75rem;
+        }
+        
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .table th {
+            background: #f3f4f6;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: #374151;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 0.875rem;
+        }
+        
+        .table td {
+            padding: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 0.875rem;
+        }
+        
+        .table tr:hover {
+            background: #f9fafb;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .badge-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .badge-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .badge-danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #111827;
+        }
+        
+        .section {
+            display: none;
+        }
+        
+        .section.active {
+            display: block;
+        }
+        
+        .demo-banner {
+            background: #fef3c7;
+            border: 1px solid #fcd34d;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            color: #92400e;
+            font-size: 0.875rem;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                min-height: auto;
+            }
+            
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+            }
+            
+            .nav-item {
+                display: inline-block;
+                width: auto;
+                padding: 0.5rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div style="padding: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.2); margin-bottom: 1rem;">
+            <h1 style="color: white; font-size: 1.5rem; font-weight: 700;">COMPURSATIL</h1>
+            <p style="color: rgba(255,255,255,0.8); font-size: 0.875rem; margin-top: 0.5rem;">Demo - Sin BD</p>
+        </div>
+        
+        <nav style="padding: 1rem 0;">
+            <div class="nav-item active" onclick="switchSection('dashboard')">
+                <span>📊</span>
+                <span>Dashboard</span>
+            </div>
+            <div class="nav-item" onclick="switchSection('inventario')">
+                <span>📦</span>
+                <span>Inventario</span>
+            </div>
+            <div class="nav-item" onclick="switchSection('ventas')">
+                <span>💰</span>
+                <span>Ventas</span>
+            </div>
+            <div class="nav-item" onclick="switchSection('clientes')">
+                <span>👥</span>
+                <span>Clientes</span>
+            </div>
+            <div class="nav-item" onclick="switchSection('reportes')">
+                <span>📈</span>
+                <span>Reportes</span>
+            </div>
+        </nav>
+    </div>
+    
+    <div class="main-content">
+        <div class="demo-banner">
+            ⚠️ Versión DEMO - Los datos se almacenan en memoria y se pierden al recargar la página
+        </div>
+        
+        <!-- DASHBOARD -->
+        <div id="dashboard" class="section active">
+            <div class="card">
+                <h2>Dashboard</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem;">
+                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1.5rem; border-radius: 0.75rem;">
+                        <div style="font-size: 0.875rem; opacity: 0.9;">Total Productos</div>
+                        <div style="font-size: 2rem; font-weight: 700; margin-top: 0.5rem;" id="totalProductos">0</div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 1.5rem; border-radius: 0.75rem;">
+                        <div style="font-size: 0.875rem; opacity: 0.9;">Total Ventas</div>
+                        <div style="font-size: 2rem; font-weight: 700; margin-top: 0.5rem;" id="totalVentas">$0</div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; padding: 1.5rem; border-radius: 0.75rem;">
+                        <div style="font-size: 0.875rem; opacity: 0.9;">Total Clientes</div>
+                        <div style="font-size: 2rem; font-weight: 700; margin-top: 0.5rem;" id="totalClientes">0</div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white; padding: 1.5rem; border-radius: 0.75rem;">
+                        <div style="font-size: 0.875rem; opacity: 0.9;">Ingresos Mes</div>
+                        <div style="font-size: 2rem; font-weight: 700; margin-top: 0.5rem;" id="ingresosMonth">$0</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- INVENTARIO -->
+        <div id="inventario" class="section">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <h2 style="margin: 0;">Gestión de Inventario</h2>
+                    <button class="btn btn-primary" onclick="openInventarioModal()">+ Agregar Producto</button>
+                </div>
+                
+                <div style="overflow-x: auto;">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Marca</th>
+                                <th>Modelo</th>
+                                <th>Serie</th>
+                                <th>RAM</th>
+                                <th>Almacenamiento</th>
+                                <th>Precio</th>
+                                <th>Stock</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventarioTable">
+                            <!-- Se llena con JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- VENTAS -->
+        <div id="ventas" class="section">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <h2 style="margin: 0;">Registrar Venta</h2>
+                </div>
+                
+                <div style="background: white; padding: 1.5rem; border-radius: 0.75rem; margin-bottom: 2rem;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+                        <div class="form-group">
+                            <label>Producto</label>
+                            <select id="ventaProducto" onchange="updateVentaPrecio()">
+                                <option value="">Seleccionar producto...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Cantidad</label>
+                            <input type="number" id="ventaCantidad" value="1" min="1">
+                        </div>
+                        <div class="form-group">
+                            <label>Cliente</label>
+                            <input type="text" id="ventaCliente" placeholder="Nombre del cliente">
+                        </div>
+                        <div class="form-group">
+                            <label>Precio Unitario</label>
+                            <input type="number" id="ventaPrecio" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label>Total</label>
+                            <input type="number" id="ventaTotal" disabled>
+                        </div>
+                        <div style="display: flex; align-items: flex-end;">
+                            <button class="btn btn-primary" style="width: 100%;" onclick="registrarVenta()">Registrar Venta</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <h3 style="margin: 1.5rem 0 1rem; font-weight: 600;">Historial de Ventas</h3>
+                <div style="overflow-x: auto;">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Cliente</th>
+                                <th>Producto</th>
+                                <th>Cantidad</th>
+                                <th>Total</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ventasTable">
+                            <!-- Se llena con JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- CLIENTES -->
+        <div id="clientes" class="section">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <h2 style="margin: 0;">Gestión de Clientes</h2>
+                    <button class="btn btn-primary" onclick="openClienteModal()">+ Agregar Cliente</button>
+                </div>
+                
+                <div style="overflow-x: auto;">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Email</th>
+                                <th>Teléfono</th>
+                                <th>Ciudad</th>
+                                <th>Compras</th>
+                                <th>Total Gastado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="clientesTable">
+                            <!-- Se llena con JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- REPORTES -->
+        <div id="reportes" class="section">
+            <div class="card">
+                <h2>Reportes</h2>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-top: 1.5rem;">
+                    <div style="background: #f9fafb; padding: 1.5rem; border-radius: 0.75rem;">
+                        <h3 style="margin-bottom: 1rem; font-weight: 600;">Top 5 Productos Más Vendidos</h3>
+                        <div id="topProductos" style="font-size: 0.875rem;">
+                            <!-- Se llena con JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <div style="background: #f9fafb; padding: 1.5rem; border-radius: 0.75rem;">
+                        <h3 style="margin-bottom: 1rem; font-weight: 600;">Productos por Stock</h3>
+                        <div id="stockProducts" style="font-size: 0.875rem;">
+                            <!-- Se llena con JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- MODALES -->
+    
+    <!-- Modal Inventario -->
+    <div id="inventarioModal" class="modal">
+        <div class="modal-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h3 style="margin: 0; font-weight: 600; font-size: 1.125rem;" id="inventarioModalTitle">Agregar Producto</h3>
+                <button onclick="closeInventarioModal()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">×</button>
+            </div>
+            
+            <div class="form-group">
+                <label>Marca</label>
+                <input type="text" id="invMarca" placeholder="ej: Dell, HP, Lenovo">
+            </div>
+            <div class="form-group">
+                <label>Modelo</label>
+                <input type="text" id="invModelo" placeholder="ej: Inspiron 15">
+            </div>
+            <div class="form-group">
+                <label>Número de Serie</label>
+                <input type="text" id="invSerie" placeholder="ej: ABC123456">
+            </div>
+            <div class="form-group">
+                <label>RAM (GB)</label>
+                <input type="number" id="invRam" placeholder="ej: 16">
+            </div>
+            <div class="form-group">
+                <label>Almacenamiento (GB)</label>
+                <input type="number" id="invAlmacenamiento" placeholder="ej: 512">
+            </div>
+            <div class="form-group">
+                <label>Procesador</label>
+                <input type="text" id="invProcesador" placeholder="ej: Intel i7">
+            </div>
+            <div class="form-group">
+                <label>Precio de Venta ($)</label>
+                <input type="number" id="invPrecio" placeholder="ej: 1500">
+            </div>
+            <div class="form-group">
+                <label>Stock</label>
+                <input type="number" id="invStock" placeholder="ej: 10">
+            </div>
+            <div class="form-group">
+                <label>Estado</label>
+                <select id="invEstado">
+                    <option value="Nuevo">Nuevo</option>
+                    <option value="Usado">Usado</option>
+                    <option value="Dañado">Dañado</option>
+                </select>
+            </div>
+            
+            <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                <button class="btn btn-primary" style="flex: 1;" onclick="guardarProducto()">Guardar</button>
+                <button class="btn btn-secondary" style="flex: 1;" onclick="closeInventarioModal()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal Cliente -->
+    <div id="clienteModal" class="modal">
+        <div class="modal-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h3 style="margin: 0; font-weight: 600; font-size: 1.125rem;">Agregar Cliente</h3>
+                <button onclick="closeClienteModal()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">×</button>
+            </div>
+            
+            <div class="form-group">
+                <label>Nombre</label>
+                <input type="text" id="cliNombre" placeholder="Nombre completo">
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="cliEmail" placeholder="email@example.com">
+            </div>
+            <div class="form-group">
+                <label>Teléfono</label>
+                <input type="tel" id="cliTelefono" placeholder="+1234567890">
+            </div>
+            <div class="form-group">
+                <label>Ciudad</label>
+                <input type="text" id="cliCiudad" placeholder="Ciudad">
+            </div>
+            
+            <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                <button class="btn btn-primary" style="flex: 1;" onclick="guardarCliente()">Guardar</button>
+                <button class="btn btn-secondary" style="flex: 1;" onclick="closeClienteModal()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // ===== DATA STORE (EN MEMORIA) =====
+        const store = {
+            productos: [
+                {
+                    id: 1,
+                    marca: 'Dell',
+                    modelo: 'Inspiron 15',
+                    serie: 'DEL001',
+                    ram: 16,
+                    almacenamiento: 512,
+                    procesador: 'Intel i7',
+                    precio: 1200,
+                    stock: 5,
+                    estado: 'Nuevo'
+                },
+                {
+                    id: 2,
+                    marca: 'HP',
+                    modelo: 'Pavilion 14',
+                    serie: 'HP001',
+                    ram: 8,
+                    almacenamiento: 256,
+                    procesador: 'AMD Ryzen 5',
+                    precio: 800,
+                    stock: 3,
+                    estado: 'Nuevo'
+                }
+            ],
+            clientes: [
+                {
+                    id: 1,
+                    nombre: 'Juan García',
+                    email: 'juan@example.com',
+                    telefono: '+34912345678',
+                    ciudad: 'Madrid',
+                    compras: 2,
+                    totalGastado: 2000
+                }
+            ],
+            ventas: [
+                {
+                    id: 1,
+                    fecha: new Date().toLocaleDateString(),
+                    cliente: 'Juan García',
+                    productoId: 1,
+                    cantidad: 1,
+                    total: 1200
+                }
+            ],
+            nextProductId: 3,
+            nextClienteId: 2,
+            nextVentaId: 2
+        };
+        
+        // ===== FUNCIONES DE SECCIÓN =====
+        function switchSection(sectionName) {
+            document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
+            document.getElementById(sectionName).classList.add('active');
+            
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            event.target.closest('.nav-item').classList.add('active');
+            
+            if (sectionName === 'inventario') renderInventario();
+            if (sectionName === 'ventas') renderVentas();
+            if (sectionName === 'clientes') renderClientes();
+            if (sectionName === 'reportes') renderReportes();
+            if (sectionName === 'dashboard') renderDashboard();
+        }
+        
+        // ===== DASHBOARD =====
+        function renderDashboard() {
+            const totalProductos = store.productos.reduce((sum, p) => sum + p.stock, 0);
+            const totalVentas = store.ventas.reduce((sum, v) => sum + v.total, 0);
+            const totalClientes = store.clientes.length;
+            
+            document.getElementById('totalProductos').textContent = totalProductos;
+            document.getElementById('totalVentas').textContent = '$' + totalVentas.toLocaleString('es-ES');
+            document.getElementById('totalClientes').textContent = totalClientes;
+            document.getElementById('ingresosMonth').textContent = '$' + totalVentas.toLocaleString('es-ES');
+        }
+        
+        // ===== INVENTARIO =====
+        function renderInventario() {
+            const tabla = document.getElementById('inventarioTable');
+            tabla.innerHTML = '';
+            
+            store.productos.forEach(producto => {
+                const row = `
+                    <tr>
+                        <td>${producto.marca}</td>
+                        <td>${producto.modelo}</td>
+                        <td>${producto.serie}</td>
+                        <td>${producto.ram}GB</td>
+                        <td>${producto.almacenamiento}GB</td>
+                        <td>$${producto.precio}</td>
+                        <td>${producto.stock}</td>
+                        <td><span class="badge badge-success">${producto.estado}</span></td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn btn-primary btn-small" onclick="editarProducto(${producto.id})">Editar</button>
+                                <button class="btn btn-danger btn-small" onclick="eliminarProducto(${producto.id})">Eliminar</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                tabla.innerHTML += row;
+            });
+        }
+        
+        function openInventarioModal() {
+            document.getElementById('inventarioModalTitle').textContent = 'Agregar Producto';
+            document.getElementById('invMarca').value = '';
+            document.getElementById('invModelo').value = '';
+            document.getElementById('invSerie').value = '';
+            document.getElementById('invRam').value = '';
+            document.getElementById('invAlmacenamiento').value = '';
+            document.getElementById('invProcesador').value = '';
+            document.getElementById('invPrecio').value = '';
+            document.getElementById('invStock').value = '';
+            document.getElementById('invEstado').value = 'Nuevo';
+            document.getElementById('inventarioModal').classList.add('active');
+            document.getElementById('inventarioModal').dataset.mode = 'add';
+        }
+        
+        function closeInventarioModal() {
+            document.getElementById('inventarioModal').classList.remove('active');
+        }
+        
+        function guardarProducto() {
+            const marca = document.getElementById('invMarca').value;
+            const modelo = document.getElementById('invModelo').value;
+            const serie = document.getElementById('invSerie').value;
+            const ram = parseInt(document.getElementById('invRam').value);
+            const almacenamiento = parseInt(document.getElementById('invAlmacenamiento').value);
+            const procesador = document.getElementById('invProcesador').value;
+            const precio = parseInt(document.getElementById('invPrecio').value);
+            const stock = parseInt(document.getElementById('invStock').value);
+            const estado = document.getElementById('invEstado').value;
+            
+            if (!marca || !modelo || !serie || !ram || !almacenamiento || !procesador || !precio || !stock) {
+                alert('Por favor completa todos los campos');
+                return;
+            }
+            
+            const producto = {
+                id: store.nextProductId++,
+                marca,
+                modelo,
+                serie,
+                ram,
+                almacenamiento,
+                procesador,
+                precio,
+                stock,
+                estado
+            };
+            
+            store.productos.push(producto);
+            renderInventario();
+            closeInventarioModal();
+            updateVentaProducts();
+        }
+        
+        function editarProducto(id) {
+            const producto = store.productos.find(p => p.id === id);
+            if (producto) {
+                document.getElementById('inventarioModalTitle').textContent = 'Editar Producto';
+                document.getElementById('invMarca').value = producto.marca;
+                document.getElementById('invModelo').value = producto.modelo;
+                document.getElementById('invSerie').value = producto.serie;
+                document.getElementById('invRam').value = producto.ram;
+                document.getElementById('invAlmacenamiento').value = producto.almacenamiento;
+                document.getElementById('invProcesador').value = producto.procesador;
+                document.getElementById('invPrecio').value = producto.precio;
+                document.getElementById('invStock').value = producto.stock;
+                document.getElementById('invEstado').value = producto.estado;
+                document.getElementById('inventarioModal').classList.add('active');
+                document.getElementById('inventarioModal').dataset.mode = 'edit';
+                document.getElementById('inventarioModal').dataset.id = id;
+            }
+        }
+        
+        function eliminarProducto(id) {
+            if (confirm('¿Estás seguro de que quieres eliminar este producto?')) {
+                store.productos = store.productos.filter(p => p.id !== id);
+                renderInventario();
+                updateVentaProducts();
+            }
+        }
+        
+        // ===== VENTAS =====
+        function updateVentaProducts() {
+            const select = document.getElementById('ventaProducto');
+            select.innerHTML = '<option value="">Seleccionar producto...</option>';
+            store.productos.forEach(p => {
+                select.innerHTML += `<option value="${p.id}">${p.marca} ${p.modelo} - $${p.precio}</option>`;
+            });
+        }
+        
+        function updateVentaPrecio() {
+            const productoId = parseInt(document.getElementById('ventaProducto').value);
+            const producto = store.productos.find(p => p.id === productoId);
+            
+            if (producto) {
+                document.getElementById('ventaPrecio').value = producto.precio;
+                calcularTotal();
+            } else {
+                document.getElementById('ventaPrecio').value = '';
+                document.getElementById('ventaTotal').value = '';
+            }
+        }
+        
+        function calcularTotal() {
+            const cantidad = parseInt(document.getElementById('ventaCantidad').value) || 0;
+            const precio = parseInt(document.getElementById('ventaPrecio').value) || 0;
+            document.getElementById('ventaTotal').value = cantidad * precio;
+        }
+        
+        function registrarVenta() {
+            const productoId = parseInt(document.getElementById('ventaProducto').value);
+            const cantidad = parseInt(document.getElementById('ventaCantidad').value);
+            const cliente = document.getElementById('ventaCliente').value;
+            const total = parseInt(document.getElementById('ventaTotal').value);
+            
+            if (!productoId || !cantidad || !cliente) {
+                alert('Por favor completa todos los campos');
+                return;
+            }
+            
+            const producto = store.productos.find(p => p.id === productoId);
+            if (producto.stock < cantidad) {
+                alert('Stock insuficiente');
+                return;
+            }
+            
+            // Restar stock
+            producto.stock -= cantidad;
+            
+            // Registrar venta
+            const venta = {
+                id: store.nextVentaId++,
+                fecha: new Date().toLocaleDateString(),
+                cliente,
+                productoId,
+                cantidad,
+                total
+            };
+            store.ventas.push(venta);
+            
+            // Actualizar cliente
+            let clienteExistente = store.clientes.find(c => c.nombre === cliente);
+            if (clienteExistente) {
+                clienteExistente.compras++;
+                clienteExistente.totalGastado += total;
+            } else {
+                store.clientes.push({
+                    id: store.nextClienteId++,
+                    nombre: cliente,
+                    email: '',
+                    telefono: '',
+                    ciudad: '',
+                    compras: 1,
+                    totalGastado: total
+                });
+            }
+            
+            renderVentas();
+            updateVentaProducts();
+            document.getElementById('ventaProducto').value = '';
+            document.getElementById('ventaCantidad').value = '1';
+            document.getElementById('ventaCliente').value = '';
+            document.getElementById('ventaPrecio').value = '';
+            document.getElementById('ventaTotal').value = '';
+        }
+        
+        function renderVentas() {
+            const tabla = document.getElementById('ventasTable');
+            tabla.innerHTML = '';
+            
+            store.ventas.forEach(venta => {
+                const producto = store.productos.find(p => p.id === venta.productoId);
+                const row = `
+                    <tr>
+                        <td>${venta.fecha}</td>
+                        <td>${venta.cliente}</td>
+                        <td>${producto ? producto.marca + ' ' + producto.modelo : 'Producto eliminado'}</td>
+                        <td>${venta.cantidad}</td>
+                        <td>$${venta.total}</td>
+                        <td>
+                            <button class="btn btn-danger btn-small" onclick="eliminarVenta(${venta.id})">Eliminar</button>
+                        </td>
+                    </tr>
+                `;
+                tabla.innerHTML += row;
+            });
+        }
+        
+        function eliminarVenta(id) {
+            if (confirm('¿Estás seguro?')) {
+                store.ventas = store.ventas.filter(v => v.id !== id);
+                renderVentas();
+            }
+        }
+        
+        // ===== CLIENTES =====
+        function openClienteModal() {
+            document.getElementById('cliNombre').value = '';
+            document.getElementById('cliEmail').value = '';
+            document.getElementById('cliTelefono').value = '';
+            document.getElementById('cliCiudad').value = '';
+            document.getElementById('clienteModal').classList.add('active');
+        }
+        
+        function closeClienteModal() {
+            document.getElementById('clienteModal').classList.remove('active');
+        }
+        
+        function guardarCliente() {
+            const nombre = document.getElementById('cliNombre').value;
+            const email = document.getElementById('cliEmail').value;
+            const telefono = document.getElementById('cliTelefono').value;
+            const ciudad = document.getElementById('cliCiudad').value;
+            
+            if (!nombre || !email) {
+                alert('Nombre y email son obligatorios');
+                return;
+            }
+            
+            const cliente = {
+                id: store.nextClienteId++,
+                nombre,
+                email,
+                telefono,
+                ciudad,
+                compras: 0,
+                totalGastado: 0
+            };
+            
+            store.clientes.push(cliente);
+            renderClientes();
+            closeClienteModal();
+        }
+        
+        function renderClientes() {
+            const tabla = document.getElementById('clientesTable');
+            tabla.innerHTML = '';
+            
+            store.clientes.forEach(cliente => {
+                const row = `
+                    <tr>
+                        <td>${cliente.nombre}</td>
+                        <td>${cliente.email}</td>
+                        <td>${cliente.telefono}</td>
+                        <td>${cliente.ciudad}</td>
+                        <td>${cliente.compras}</td>
+                        <td>$${cliente.totalGastado}</td>
+                        <td>
+                            <button class="btn btn-danger btn-small" onclick="eliminarCliente(${cliente.id})">Eliminar</button>
+                        </td>
+                    </tr>
+                `;
+                tabla.innerHTML += row;
+            });
+        }
+        
+        function eliminarCliente(id) {
+            if (confirm('¿Estás seguro?')) {
+                store.clientes = store.clientes.filter(c => c.id !== id);
+                renderClientes();
+            }
+        }
+        
+        // ===== REPORTES =====
+        function renderReportes() {
+            // Top 5 productos más vendidos
+            const productosVendidos = {};
+            store.ventas.forEach(venta => {
+                productosVendidos[venta.productoId] = (productosVendidos[venta.productoId] || 0) + venta.cantidad;
+            });
+            
+            const topProductos = Object.entries(productosVendidos)
+                .map(([id, cantidad]) => {
+                    const producto = store.productos.find(p => p.id === parseInt(id));
+                    return { producto, cantidad };
+                })
+                .sort((a, b) => b.cantidad - a.cantidad)
+                .slice(0, 5);
+            
+            let html = '<ul style="list-style: none;">';
+            if (topProductos.length === 0) {
+                html += '<li style="color: #999;">Sin ventas registradas</li>';
+            } else {
+                topProductos.forEach(item => {
+                    html += `<li style="padding: 0.5rem 0; border-bottom: 1px solid #e5e7eb;">
+                        ${item.producto.marca} ${item.producto.modelo}: <strong>${item.cantidad} unidades</strong>
+                    </li>`;
+                });
+            }
+            html += '</ul>';
+            document.getElementById('topProductos').innerHTML = html;
+            
+            // Stock de productos
+            let stockHtml = '<ul style="list-style: none;">';
+            store.productos.forEach(p => {
+                const badgeClass = p.stock > 10 ? 'badge-success' : p.stock > 0 ? 'badge-warning' : 'badge-danger';
+                stockHtml += `<li style="padding: 0.5rem 0; border-bottom: 1px solid #e5e7eb;">
+                    ${p.marca} ${p.modelo}: <span class="badge ${badgeClass}">${p.stock} unidades</span>
+                </li>`;
+            });
+            stockHtml += '</ul>';
+            document.getElementById('stockProducts').innerHTML = stockHtml;
+        }
+        
+        // ===== INICIALIZACIÓN =====
+        document.addEventListener('DOMContentLoaded', () => {
+            updateVentaProducts();
+            renderDashboard();
+        });
+        
+        // Actualizar total al cambiar cantidad
+        document.getElementById('ventaCantidad')?.addEventListener('input', calcularTotal);
+    </script>
+</body>
+</html>
