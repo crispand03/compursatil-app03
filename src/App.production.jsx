@@ -50,19 +50,10 @@ import {
 } from 'lucide-react';
 import * as XLSX from 'xlsx';
 
-// ============================================
-// MODO DEMO - Detectar si está en GitHub Pages
-// ============================================
-const IS_GITHUB_PAGES = window.location.hostname === 'crispand03.github.io';
-const DEMO_MODE = IS_GITHUB_PAGES || import.meta.env.MODE === 'demo';
-
 // API Configuration - dinámico para desarrollo y producción
-const API_BASE = !DEMO_MODE && import.meta.env.MODE === 'production' && import.meta.env.VITE_API_URL
+const API_BASE = import.meta.env.MODE === 'production' && import.meta.env.VITE_API_URL
   ? import.meta.env.VITE_API_URL
-  : !DEMO_MODE
-  ? 'http://localhost:3001/api'
-  : null; // null para demo mode
-
+  : 'http://localhost:3001/api';
 
 // Componente Login separado y simplificado
 const LoginComponent = ({ handleLogin, loginError, showPassword, setShowPassword }) => {
@@ -418,38 +409,6 @@ const App = () => {
   // Login handler - Recibe username y password como parámetros
   const handleLogin = async (username, password) => {
     try {
-      // Si está en modo DEMO, usar autenticación local
-      if (DEMO_MODE) {
-        // Validar credentials locales
-        const validUsers = [
-          { username: 'admin', password: 'admin123', name: 'Administrador', role: 'Administrador' },
-          { username: 'usuario', password: 'usuario123', name: 'Usuario', role: 'Vendedor' }
-        ];
-        
-        const user = validUsers.find(u => u.username === username && u.password === password);
-        if (user) {
-          const userData = {
-            name: user.name,
-            role: user.role,
-            username: user.username,
-            token: 'demo-token-' + Date.now(),
-            id: 1
-          };
-          setCurrentUser(userData);
-          setIsLoggedIn(true);
-          setLoginError('');
-          setLoginUsername('');
-          setLoginPassword('');
-          localStorage.setItem('currentUser', JSON.stringify(userData));
-          // Cargar datos demo
-          loadDemoData();
-        } else {
-          setLoginError('Usuario o contraseña incorrectos');
-        }
-        return;
-      }
-
-      // Si NO está en modo DEMO, usar API
       const response = await fetch(`${API_BASE}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -502,142 +461,6 @@ const App = () => {
     setShipments([]);
     setExtraComponents([]);
     localStorage.removeItem('currentUser');
-  };
-
-  // DEMO MODE: Load demo data instead of from API
-  const loadDemoData = () => {
-    // Demo inventory
-    const demoInventory = [
-      {
-        id: 1,
-        brand: 'Dell',
-        model: 'Inspiron 15 5000',
-        serial: 'DEL123456',
-        ram: 16,
-        storage: 512,
-        processor: 'Intel Core i7',
-        gpu: 'NVIDIA GeForce GTX 1650',
-        screen: '15.6" FHD',
-        os: 'Windows 11',
-        status: 'Nuevo',
-        supplier: 'Proveedor A',
-        cost: 800,
-        price: 1200,
-        stock: 5,
-        image: 'https://placehold.co/300x200/cccccc/666666?text=Dell+Laptop',
-        addedDate: new Date().toISOString()
-      },
-      {
-        id: 2,
-        brand: 'HP',
-        model: 'Pavilion 14',
-        serial: 'HP789012',
-        ram: 8,
-        storage: 256,
-        processor: 'AMD Ryzen 5',
-        gpu: 'AMD Radeon',
-        screen: '14" FHD',
-        os: 'Windows 10',
-        status: 'Nuevo',
-        supplier: 'Proveedor B',
-        cost: 600,
-        price: 900,
-        stock: 3,
-        image: 'https://placehold.co/300x200/cccccc/666666?text=HP+Laptop',
-        addedDate: new Date().toISOString()
-      },
-      {
-        id: 3,
-        brand: 'Lenovo',
-        model: 'ThinkPad E15',
-        serial: 'LEV345678',
-        ram: 16,
-        storage: 512,
-        processor: 'Intel Core i7',
-        gpu: 'Intel Iris Xe',
-        screen: '15.6" IPS',
-        os: 'Windows 11 Pro',
-        status: 'Nuevo',
-        supplier: 'Proveedor C',
-        cost: 900,
-        price: 1400,
-        stock: 2,
-        image: 'https://placehold.co/300x200/cccccc/666666?text=Lenovo+Laptop',
-        addedDate: new Date().toISOString()
-      }
-    ];
-
-    // Demo customers
-    const demoCustomers = [
-      {
-        id: 1,
-        name: 'Juan García',
-        document: '12345678',
-        documentType: 'DNI',
-        phone: '+34 912 345 678',
-        email: 'juan.garcia@example.com',
-        address: 'Calle Principal 123',
-        city: 'Madrid'
-      },
-      {
-        id: 2,
-        name: 'María López',
-        document: '87654321',
-        documentType: 'DNI',
-        phone: '+34 923 456 789',
-        email: 'maria.lopez@example.com',
-        address: 'Avenida Central 456',
-        city: 'Barcelona'
-      },
-      {
-        id: 3,
-        name: 'Carlos Martínez',
-        document: '11223344',
-        documentType: 'Pasaporte',
-        phone: '+34 934 567 890',
-        email: 'carlos.martinez@example.com',
-        address: 'Plaza Mayor 789',
-        city: 'Valencia'
-      }
-    ];
-
-    // Demo sales
-    const demoSales = [
-      {
-        id: 1,
-        date: new Date().toISOString().split('T')[0],
-        time: '09:30',
-        customer: 'Juan García',
-        customerId: 1,
-        items: [
-          {
-            id: 1,
-            name: 'Dell Inspiron 15 5000',
-            serial: 'DEL123456',
-            quantity: 1,
-            price: 1200,
-            subtotal: 1200,
-            igv: 228,
-            total: 1428
-          }
-        ],
-        total: 1428,
-        sellerName: 'Administrador',
-        seller: 'Administrador',
-        payment: 'Tarjeta Crédito',
-        documentType: 'Factura',
-        documentNumber: 'F001-000001',
-        observations: 'Venta exitosa'
-      }
-    ];
-
-    setInventory(demoInventory);
-    setCustomers(demoCustomers);
-    setSales(demoSales);
-    setWarranties([]);
-    setTechnicalCases([]);
-    setShipments([]);
-    setExtraComponents([]);
   };
 
   // Helper function to map inventory data from backend to frontend format
