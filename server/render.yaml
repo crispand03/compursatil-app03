@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: compursatil-api
+    runtime: node
+    plan: free
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3001
+      - key: DB_HOST
+        scope: PROJECT
+      - key: DB_USER
+        scope: PROJECT
+      - key: DB_PASSWORD
+        scope: PROJECT
+      - key: DB_NAME
+        value: compursatil
+      - key: DB_PORT
+        value: 3306
+      - key: JWT_SECRET
+        scope: PROJECT

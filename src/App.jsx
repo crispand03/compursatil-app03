@@ -50,8 +50,10 @@ import {
 } from 'lucide-react';
 import * as XLSX from 'xlsx';
 
-// API Configuration
-const API_BASE = 'http://localhost:3001/api';
+// API Configuration - dinámico para desarrollo y producción
+const API_BASE = import.meta.env.MODE === 'production' && import.meta.env.VITE_API_URL
+  ? import.meta.env.VITE_API_URL
+  : 'http://localhost:3001/api';
 
 // Componente Login separado y simplificado
 const LoginComponent = ({ handleLogin, loginError, showPassword, setShowPassword }) => {
